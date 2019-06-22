@@ -1,4 +1,4 @@
-package bigdata.mba
+package twitter.bigdata
 
 import java.sql.Timestamp
 

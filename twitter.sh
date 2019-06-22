@@ -5,7 +5,7 @@ then
 	echo 'usage:' $0 'número_do_exemplo'
 	exit 0
 else
-    PACKAGE=bigdata.mba
+    PACKAGE=twitter.bigdata
     URL_MASTER=spark://Andrezas-MacBook-Air.local:7077
     DADOS_DIR=/Users/andrezamoreira/Documents/streaming
     ATIVIDADES=$DADOS_DIR/atividades
@@ -14,31 +14,19 @@ else
     USA_TWEETS_STREAM=$DADOS_DIR/usa_tweets_stream
     case $1 in
         1)
-            CLASS=$PACKAGE.Ex01_NetworkWordCount
-            PARAMS=`echo 'localhost 9999'`
+            CLASS=$PACKAGE.FiltroHashtag
+            PARAMS=$USA_TWEETS_STREAM
             ;;
         2)
-            CLASS=$PACKAGE.Ex02_DiretorioLocalFixo
-            PARAMS=$ATIVIDADES
+            CLASS=$PACKAGE.FiltroHashtagsTempo
+            PARAMS=$USA_TWEETS_STREAM
             ;;
         3)
-            CLASS=$PACKAGE.Ex03_DiretorioLocalStream
-            PARAMS=$ATIVIDADES_STREAM
+            CLASS=$PACKAGE.FiltroHashtagsTempoArquivo
+            PARAMS=$USA_TWEETS_STREAM
             ;;
         4)
-            CLASS=$PACKAGE.Ex04_Hashtags
-            PARAMS=$USA_TWEETS_STREAM
-            ;;
-        5)
-            CLASS=$PACKAGE.Ex05_HashtagsWindows
-            PARAMS=$USA_TWEETS_STREAM
-            ;;
-        6)
-            CLASS=$PACKAGE.Ex06_HashtagsWindowsArquivo
-            PARAMS=$USA_TWEETS_STREAM
-            ;;
-        8)
-            CLASS=$PACKAGE.Ex08_HashtagsWindowsArquivoCSV
+            CLASS=$PACKAGE.FiltroHashtagsTempoArquivoCSV
             PARAMS=$USA_TWEETS_STREAM
             ;;
         *)

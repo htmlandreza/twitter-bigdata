@@ -1,4 +1,4 @@
-package bigdata.mba
+package twitter.bigdata
 
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
@@ -12,7 +12,7 @@ import org.apache.spark.sql.streaming.Trigger
 import scala.concurrent.duration._
 import java.sql.Timestamp
 
-object Ex05_HashtagsWindows {
+object FiltroHashtagsTempo {
 
   def main(args: Array[String]){
     if (args.length < 1) {
@@ -29,42 +29,31 @@ object Ex05_HashtagsWindows {
     
     val spark = SparkSession
       .builder
-      //.master("local[*]")
-      .appName("Ex05_HashtagsWindows")
+      .master("local[*]")
+      .appName("FiltroHashtagsTempo")
       .getOrCreate()
 
     import spark.implicits._
     
-    val esquema = StructType(StructField("Tweet Id", StringType, true) ::
-		StructField("Date", StringType, true) ::
-		StructField("Hour", StringType, true) ::
-		StructField("User Name", StringType, true) ::
-		StructField("Nickname", StringType, true) ::
-		StructField("Bio", StringType, true) ::
-		StructField("Tweet content", StringType, true) ::
-		StructField("Favs", StringType, true) ::
-		StructField("RTs", StringType, true) ::
-		StructField("Latitude", StringType, true) ::
-		StructField("Longitude", StringType, true) ::
-		StructField("Country", StringType, true) ::
-		StructField("Place (as appears on Bio)", StringType, true) ::
-		StructField("Profile picture", StringType, true) ::
-		StructField("Followers", StringType, true) ::
-		StructField("Following", StringType, true) ::
-		StructField("Listed", StringType, true) ::
-		StructField("Tweet language (ISO 639-1)", StringType, true) ::
-		StructField("Tweet Url", StringType, true) :: Nil)
+    val esquema = StructType(StructField("id", StringType, true) ::
+		StructField("date", StringType, true) ::
+		StructField("hour", StringType, true) ::
+		StructField("username", StringType, true) ::
+		StructField("text", StringType, true) ::
+		StructField("retweet_count", StringType, true) ::
+		StructField("favorite_count", StringType, true) ::
+		StructField("source", StringType, true) :: Nil)
 
     val leituras = spark.readStream
 		.schema(esquema)
     	.csv(diretorio)
        
     val twds = leituras
-    	.filter(!isnull($"Tweet content"))
+    	.filter(!isnull($"text"))
     	.select( unix_timestamp(
-    	    format_string("%s %s:00", $"Date", $"Hour")
+    	    format_string("%s %s:00", $"date", $"hour")
     	    ).cast("timestamp") as "tempo", 
-    	    $"Tweet content" as "conteudo")
+    	    $"text" as "conteudo")
     	.as[TweetWindow]
     
     val hashtags = twds
