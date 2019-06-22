@@ -2,7 +2,7 @@
 
 if [ -z $1 ]
 then
-	echo 'usage:' $0 'número_do_exemplo'
+	echo 'usage:' $0 'número_da_atividade'
 	exit 0
 else
     PACKAGE=twitter.bigdata
@@ -12,6 +12,8 @@ else
     ATIVIDADES_STREAM=$DADOS_DIR/atividades_stream
     USA_TWEETS=$DADOS_DIR/usa_tweets
     USA_TWEETS_STREAM=$DADOS_DIR/usa_tweets_stream
+    
+    #ATIVIDADES
     case $1 in
         1)
             CLASS=$PACKAGE.FiltroHashtag
@@ -30,12 +32,12 @@ else
             PARAMS=$USA_TWEETS_STREAM
             ;;
         *)
-            echo 'Exemplo inválido:' $1
+            echo 'Atividade inválido:' $1
             exit 1
             ;;
     esac
     JAR=target/scala-2.11/twitter-streaming_2.11-1.0.jar
-    echo 'Executando exemplo' $1 '...'
+    echo 'Executando atividade' $1 '...'
     #java -cp $CP $CLASS $PARAMS
     spark-submit --master $URL_MASTER --class $CLASS $JAR $PARAMS 
     exit 0
