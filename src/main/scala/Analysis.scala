@@ -46,14 +46,20 @@ object Analysis {
 
     leitura.show(false)
 
+    val dadosDS = leitura.select($"screen_name" as "username", $"source" as "source", $"text" as "tweet", $"hashtags" as "hashtags").as[Tweet]
+
+    dadosDS.show(false)
     //trabalhando com Row, necessário converter para String para efetuar transformações
     val converted = leitura.map(l => l.toString)
 
-    val source = converted.map(l => (l.split(">")(1)))
-    .map(l => (l.split("<")(0)))
-    .withColumnRenamed("value", "Source")
+    val source = converted.map(source => (source.split(">")(1)))
+      .map(l => (l.split("<")(0)))
+      .withColumnRenamed("value", "source")
 
-    source.show(false)
-
+    val sourceCounting = source.groupBy("source")
+      .count
+      .withColumnRenamed("value", "source")
+      .orderBy($"count".desc)
+      .show
   }
 }
