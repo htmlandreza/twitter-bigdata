@@ -1,6 +1,5 @@
-//package bigdata.mba
+package twitter.bigdata
 
-//import org.apache.spark.sql._
 import org.apache.spark.sql.{ Dataset, Row, _ }
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.SparkSession
@@ -12,11 +11,11 @@ import org.apache.spark.sql.streaming.OutputMode._
 import org.apache.spark.sql.streaming.Trigger
 import scala.concurrent.duration._
 
-object Analysis {
+object MostUsedSources {
 
   def main(args: Array[String]) {
     if (args.length < 1) {
-      System.err.println("Usage: Analysis diretorio")
+      System.err.println("Usage: AnalysisStreaming diretorio")
       System.exit(1)
     }
 
@@ -27,39 +26,39 @@ object Analysis {
     val spark = SparkSession
       .builder
       .master("local[*]")
-      .appName("Analysis")
+      .appName("AnalysisStreaming")
       .getOrCreate()
 
     import spark.implicits._
 
-    /*
-     * Para ler do JSON
-     *
-     * val leitura = spark.read
-      .json("json.json")
+    val schema = StructType(
+      StructField("screen_name", StringType, true) ::
+        StructField("source", StringType, true) ::
+        StructField("text", StringType, true) ::
+        StructField("hashtags", StringType, true) :: Nil)
 
-    leitura.show(false)*/
+    val reader = spark.readStream
+      .schema(schema)
+      .csv(diretorio)
 
-    val leitura = spark.read
-      .option("header", "true")
-      .csv("teste.csv")
+    val converted = reader.map(l => l.toString)
 
-    leitura.show(false)
-
-    val dadosDS = leitura.select($"screen_name" as "username", $"source" as "source", $"text" as "tweet", $"hashtags" as "hashtags").as[Tweet]
-
-    dadosDS.show(false)
-    //trabalhando com Row, necessário converter para String para efetuar transformações
-    val converted = leitura.map(l => l.toString)
-
-    val source = converted.map(source => (source.split(">")(1)))
-      .map(l => (l.split("<")(0)))
+    val source = converted.map(l => (l.split(",")(1)))
+      .map(l => (l.split(",")(0)))
       .withColumnRenamed("value", "source")
 
-    val sourceCounting = source.groupBy("source")
+    val mostUsedSources = source.groupBy("source")
       .count
       .withColumnRenamed("value", "source")
       .orderBy($"count".desc)
-      .show
+
+    val query = mostUsedSources.writeStream
+      .outputMode(Complete)
+      .trigger(Trigger.ProcessingTime("5 seconds"))
+      .format("console")
+      .start()
+
+    query.awaitTermination()
+    
   }
 }
