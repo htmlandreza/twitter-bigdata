@@ -15,7 +15,7 @@ object MostUsedWords {
 
   def main(args: Array[String]) {
     if (args.length < 1) {
-      System.err.println("Usage: AnalysisStreaming diretorio")
+      System.err.println("Usage: MostUsedWords diretorio")
       System.exit(1)
     }
 
@@ -32,27 +32,30 @@ object MostUsedWords {
     import spark.implicits._
 
     val schema = StructType(
-      StructField("screen_name", StringType, true) ::
-        StructField("source", StringType, true) ::
-        StructField("text", StringType, true) ::
-        StructField("hashtags", StringType, true) :: Nil)
+      StructField("date", StringType, true) ::
+      StructField("text", StringType, true) ::
+      StructField("source", StringType, true) ::
+      StructField("username", StringType, true) ::
+      StructField("hashtags", StringType, true) :: Nil)
 
     val reader = spark.readStream
       .schema(schema)
       .csv(diretorio)
 
-    val converted = reader.map(l => l.toString)
+     val twds = reader
+    	.filter(!isnull($"text"))
+    	.select($"date" as "data", $"text" as "tweet")
+    	.as[Tweet]    
 
-    val words = converted.map(l => (l.split(",")(2)))
-      .map(l => l.split(" "))
+    val words = twds.flatMap(l => l.tweet.split(" "))
       .filter(l => l.length > 2)
-      .withColumn("value", explode($"value"))
+      .map(ht => ht.toUpperCase)
       .withColumnRenamed("value", "words")
 
     val mostUsedWords = words.groupBy("words")
       .count
-      .withColumnRenamed("value", "words")
-      .orderBy($"count".desc)
+      .sort($"count".desc)
+      .withColumnRenamed("count", "contagem")  
 
     val query = mostUsedWords.writeStream
       .outputMode(Complete)
