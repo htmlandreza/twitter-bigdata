@@ -32,9 +32,10 @@ object MostUsedWords {
     import spark.implicits._
 
     val schema = StructType(
-      StructField("screen_name", StringType, true) ::
-        StructField("source", StringType, true) ::
+      StructField("date", StringType, true) ::
         StructField("text", StringType, true) ::
+        StructField("source", StringType, true) ::
+        StructField("username", StringType, true) ::
         StructField("hashtags", StringType, true) :: Nil)
 
     val reader = spark.readStream
@@ -43,7 +44,7 @@ object MostUsedWords {
 
     val converted = reader.map(l => l.toString)
 
-    val words = converted.map(l => (l.split(",")(2)))
+    val words = converted.map(l => (l.split(",")(1)))
       .map(l => l.split(" "))
       .filter(l => l.length > 2)
       .withColumn("value", explode($"value"))
