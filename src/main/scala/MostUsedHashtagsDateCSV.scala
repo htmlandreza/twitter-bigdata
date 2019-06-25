@@ -12,11 +12,11 @@ import org.apache.spark.sql.streaming.Trigger
 import scala.concurrent.duration._
 import java.sql.Timestamp
 
-object FiltroHashtagsTempoArquivoCSV {
+object MostUsedHashtagsDateCSV {
 
   def main(args: Array[String]){
     if (args.length < 1) {
-      System.err.println("Usage: FiltroHashtagsTempoArquivoCSV diretorio")
+      System.err.println("Usage: MostUsedHashtagsDateCSV diretorio")
       System.exit(1)
     }
 
@@ -27,28 +27,28 @@ object FiltroHashtagsTempoArquivoCSV {
     val spark = SparkSession
       .builder
       .master("local[*]")
-      .appName("FiltroHashtagsTempoArquivoCSV")
+      .appName("MostUsedHashtagsDateCSV")
       .getOrCreate()
 
     import spark.implicits._
     
-    val esquema = StructType(StructField("id", StringType, true) ::
-		StructField("date", StringType, true) ::
-		StructField("hour", StringType, true) ::
-		StructField("username", StringType, true) ::
-		StructField("text", StringType, true) ::
-		StructField("retweet_count", StringType, true) ::
-		StructField("favorite_count", StringType, true) ::
-		StructField("source", StringType, true) :: Nil)
+    val schema = StructType(
+      StructField("date", StringType, true) ::
+			StructField("hour", StringType, true) ::
+      StructField("text", StringType, true) ::
+      StructField("source", StringType, true) ::
+      StructField("username", StringType, true) ::
+      StructField("hashtags", StringType, true) :: Nil)
 
+    
     val leituras = spark.readStream
-		.schema(esquema)
+		.schema(schema)
     	.csv(diretorio)
        
     val twds = leituras
     	.filter(!isnull($"text"))
     	.select( unix_timestamp(
-    	    format_string("%s %s:00", $"date", $"hour")
+    	    format_string("%s:00", $"hour")
     	    ).cast("timestamp") as "tempo", 
     	    $"text" as "conteudo")
     	.as[TweetWindow]
@@ -68,13 +68,13 @@ object FiltroHashtagsTempoArquivoCSV {
     	//    $"conteudo", $"count" as "contagem")
     	.select($"window.start" as "inicio", $"window.end" as "fim", 
     	    $"conteudo", $"count" as "contagem")
- 
+
     val query = contagem.writeStream
       .outputMode(Append)
       .format("csv")
       .trigger(Trigger.ProcessingTime(10.seconds))
-      .option("path", "/Users/andrezamoreira/Documents/streaming/windowhashtags.csv")
-      .option("checkpointLocation", "/Users/andrezamoreira/Documents/streaming/chckptcsv")
+      .option("path", "/Users/andrezamoreira/Documents/streaming/Realtime/hashtag")
+      .option("checkpointLocation", "/Users/andrezamoreira/Documents/streaming/Realtime/hashtag/log")
       .start()
 
     //query.awaitTermination()

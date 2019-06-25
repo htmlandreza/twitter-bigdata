@@ -38,7 +38,7 @@ object MostUsedHashtagsDate {
     
     val schema = StructType(
       StructField("date", StringType, true) ::
-			//StructField("hour", StringType, true) ::
+			StructField("hour", StringType, true) ::
       StructField("text", StringType, true) ::
       StructField("source", StringType, true) ::
       StructField("username", StringType, true) ::

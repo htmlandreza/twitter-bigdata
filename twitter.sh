@@ -16,19 +16,24 @@ else
     #ATIVIDADES
     case $1 in
         1)
-            CLASS=$PACKAGE.FiltroHashtag
+            CLASS=$PACKAGE.MostUsedHashtags
             PARAMS=$USA_TWEETS_STREAM
             ;;
         2)
-            CLASS=$PACKAGE.FiltroHashtagsTempo
+            # Hashtags Mais Usadas por Data
+            CLASS=$PACKAGE.MostUsedHashtagsDate
             PARAMS=$USA_TWEETS_STREAM
             ;;
         3)
-            CLASS=$PACKAGE.FiltroHashtagsTempoArquivo
+            CLASS=$PACKAGE.MostUsedHashtagsDateCSV
             PARAMS=$USA_TWEETS_STREAM
             ;;
         4)
-            CLASS=$PACKAGE.FiltroHashtagsTempoArquivoCSV
+            CLASS=$PACKAGE.MostUsedSources
+            PARAMS=$USA_TWEETS_STREAM
+            ;;
+        5)
+            CLASS=$PACKAGE.MostUsedWords
             PARAMS=$USA_TWEETS_STREAM
             ;;
         *)

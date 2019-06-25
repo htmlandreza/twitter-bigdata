@@ -11,6 +11,8 @@ import org.apache.spark.sql.streaming.OutputMode._
 import org.apache.spark.sql.streaming.Trigger
 import scala.concurrent.duration._
 
+//import java.nio.charset.StandardCharsets.UTF_8
+
 object MostUsedWords {
 
   def main(args: Array[String]) {
@@ -33,6 +35,7 @@ object MostUsedWords {
 
     val schema = StructType(
       StructField("date", StringType, true) ::
+      StructField("hour", StringType, true) ::
       StructField("text", StringType, true) ::
       StructField("source", StringType, true) ::
       StructField("username", StringType, true) ::
@@ -46,10 +49,13 @@ object MostUsedWords {
     	.filter(!isnull($"text"))
     	.select($"date" as "data", $"text" as "tweet")
     	.as[Tweet]    
+      
 
     val words = twds.flatMap(l => l.tweet.split(" "))
-      .filter(l => l.length > 2)
+    .filter(l => l.length > 3)
       .map(ht => ht.toUpperCase)
+      // TODO: Buscar forma de tratar o problema com a acentuação
+      //.getBytes("UTF_8")
       .withColumnRenamed("value", "words")
 
     val mostUsedWords = words.groupBy("words")
