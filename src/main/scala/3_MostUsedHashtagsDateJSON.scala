@@ -12,11 +12,11 @@ import org.apache.spark.sql.streaming.Trigger
 import scala.concurrent.duration._
 import java.sql.Timestamp
 
-object MostUsedHashtagsDateCSV {
+object MostUsedHashtagsDateJSON {
 
   def main(args: Array[String]){
     if (args.length < 1) {
-      System.err.println("Usage: MostUsedHashtagsDateCSV diretorio")
+      System.err.println("Usage: MostUsedHashtagsDateJSON diretorio")
       System.exit(1)
     }
 
@@ -27,7 +27,7 @@ object MostUsedHashtagsDateCSV {
     val spark = SparkSession
       .builder
       .master("local[*]")
-      .appName("MostUsedHashtagsDateCSV")
+      .appName("MostUsedHashtagsDateJSON")
       .getOrCreate()
 
     import spark.implicits._
@@ -40,7 +40,6 @@ object MostUsedHashtagsDateCSV {
       StructField("username", StringType, true) ::
       StructField("hashtags", StringType, true) :: Nil)
 
-    
     val leituras = spark.readStream
 		.schema(schema)
     	.csv(diretorio)
@@ -48,7 +47,7 @@ object MostUsedHashtagsDateCSV {
     val twds = leituras
     	.filter(!isnull($"text"))
     	.select( unix_timestamp(
-    	    format_string("%s:00", $"hour")
+    	    format_string("%s %s:00", $"date", $"hour")
     	    ).cast("timestamp") as "tempo", 
     	    $"text" as "conteudo")
     	.as[TweetWindow]
@@ -60,21 +59,19 @@ object MostUsedHashtagsDateCSV {
     val contagem = hashtags
     	.withWatermark("tempo","10 minutes")
     	.groupBy(
-    		window($"tempo", "30 minutes", "15 minutes"),
+    		window($"tempo", "60 minutes", "30 minutes"),
     		$"conteudo"
     	)
     	.count
-    	//.select($"window".apply("start") as "inicio", $"window".apply("end") as "fim", 
-    	//    $"conteudo", $"count" as "contagem")
-    	.select($"window.start" as "inicio", $"window.end" as "fim", 
+    	.select($"window.start" as "inicio", $"window.end" as "fim",
     	    $"conteudo", $"count" as "contagem")
-
+          
     val query = contagem.writeStream
       .outputMode(Append)
-      .format("csv")
+      .format("json")
       .trigger(Trigger.ProcessingTime(10.seconds))
-      .option("path", "/Users/andrezamoreira/Documents/streaming/Realtime/hashtag")
-      .option("checkpointLocation", "/Users/andrezamoreira/Documents/streaming/Realtime/hashtag/log")
+      .option("path", "/Users/andrezamoreira/Documents/streaming/Realtime/hashtag/json")
+      .option("checkpointLocation", "/Users/andrezamoreira/Documents/streaming/Realtime/hashtag/chckpt")
       .start()
 
     //query.awaitTermination()
@@ -84,18 +81,5 @@ object MostUsedHashtagsDateCSV {
 	query.stop()
 	println("Fim!")
 	
-      /* shell:
-      import org.apache.spark.sql.types._
-      import java.sql.Timestamp
-      import spark.implicits._
-      case class TweetWindow(inico:java.sql.Timestamp, fim:java.sql.Timestamp, conteudo:String, contagem:Int)
-      Com Strings: val esq = new StructType().add("inicio", StringType).add("fim", StringType).add("conteudo",StringType).add("contagem", IntegerType)
-      val esq = new StructType().add("inicio", TimestampType).add("fim", TimestampType).add("conteudo",StringType).add("contagem", IntegerType)
-      val df = spark.read.schema(esq).csv("windowhashtags.csv")
-      df.orderBy($"inicio").take(100).foreach(println)
-      df.createOrReplaceTempView("hashtag")
-      spark.sql("select conteudo, sum(contagem) as total from hashtag group by conteudo order by total desc limit 10").show
-      spark.sql("select inicio, fim, conteudo, contagem from hashtag h1 where contagem = (select max(contagem) from hashtag h2 where h2.inicio = h1.inicio and h2.fim = h1.fim) order by inicio").show
-      */      
   }
 }

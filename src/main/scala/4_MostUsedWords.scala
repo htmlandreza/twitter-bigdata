@@ -66,6 +66,12 @@ object MostUsedWords {
       .start()
 
     query.awaitTermination()
-
+  
+  while (scala.io.StdIn.readLine("X + [ENTER] para sair! ").trim.toUpperCase != "X"){
+	}
+	println("Encerrando...")
+	query.stop()
+	println("Fim!")
+	
   }
 }

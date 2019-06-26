@@ -8,8 +8,6 @@ else
     PACKAGE=twitter.bigdata
     URL_MASTER=spark://Andrezas-MacBook-Air.local:7077
     DADOS_DIR=/Users/andrezamoreira/Documents/streaming
-    ATIVIDADES=$DADOS_DIR/atividades
-    ATIVIDADES_STREAM=$DADOS_DIR/atividades_stream
     USA_TWEETS=$DADOS_DIR/usa_tweets
     USA_TWEETS_STREAM=$DADOS_DIR/usa_tweets_stream
     
@@ -25,14 +23,10 @@ else
             PARAMS=$USA_TWEETS_STREAM
             ;;
         3)
-            CLASS=$PACKAGE.MostUsedHashtagsDateCSV
+            CLASS=$PACKAGE.MostUsedHashtagsDateJSON
             PARAMS=$USA_TWEETS_STREAM
             ;;
         4)
-            CLASS=$PACKAGE.MostUsedSources
-            PARAMS=$USA_TWEETS_STREAM
-            ;;
-        5)
             CLASS=$PACKAGE.MostUsedWords
             PARAMS=$USA_TWEETS_STREAM
             ;;
