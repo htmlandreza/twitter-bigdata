@@ -2,7 +2,7 @@
 Trabalho de Big Data Science usando API do Twiiter em Tempo Real para fazer Analises.
 
 ## Hashtags por Intervalo de Data
-Foi usado o __Simulador de Streaming__ e é possivel executar por meio do:
+Foi usado o __Simulador de Streaming__, passando os dados que estão setados na pasta _data_ e é possivel executar por meio do Terminal:
 
 ```
     sbt package
