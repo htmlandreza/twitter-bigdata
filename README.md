@@ -8,8 +8,8 @@ Foi usado o __Simulador de Streaming__ e é possivel executar por meio do:
     sbt package
 
     sh twitter.sh *
-
 ```
+__  Alterar o * por um dos números abaixo. (1, 2, 3 ou 4) __
 1. Contador de Hashtags
 2. Contador de Hashtags por Data
 3. Contador de Hashtags por Intervalo de Datas, que gera JSON para o Tableau
