@@ -10,7 +10,7 @@ Foi usado o __Simulador de Streaming__ e é possivel executar por meio do:
     sh twitter.sh *
 
 ```
-__ 1. __ Contador de Hashtags
-__ 2. __ Contador de Hashtags por Data
-__ 3. __ Contador de Hashtags por Intervalo de Datas, que gera JSON para o Tableau
-__ 4. __ Contador de Palavras
+1. Contador de Hashtags
+2. Contador de Hashtags por Data
+3. Contador de Hashtags por Intervalo de Datas, que gera JSON para o Tableau
+4. Contador de Palavras
