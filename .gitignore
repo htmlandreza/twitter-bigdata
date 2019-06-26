@@ -5,14 +5,19 @@
 .cache/
 .history/
 .lib/
+.bin/
 dist/*
 target/
 lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+project/project
+project/target
 
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
 .idea
+.DS_Store
+.classpath
