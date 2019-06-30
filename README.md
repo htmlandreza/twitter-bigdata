@@ -1,5 +1,7 @@
-# twitter-bigdata
-Trabalho de Big Data Science usando API do Twiiter em Tempo Real para fazer Analises.
+#Trabalho de Big Data Science usando API do Twiiter em Tempo Real para fazer Análises.
+Trabalho desenvolvido para o MBA em Engenharia de Software/UFRJ.
+
+[Link da apresentação do trabalho.](https://github.com/htmlandreza/twitter-bigdata/blob/master/BIG%20DATA.pdf)
 
 ## Hashtags por Intervalo de Data
 Foi usado o __Simulador de Streaming__, passando os dados que estão setados na pasta _data_ e é possivel executar por meio do Terminal:
